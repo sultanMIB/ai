@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مساعد جامعة الكويت الذكي</title>
+    <style>
+        :root {
+            --primary-color: #2a5bd7;
+            --text-color: #333;
+            --light-gray: #f5f5f5;
+            --border-color: #e0e0e0;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        .logo-container {
+            text-align: center;
+            margin: 40px 0 30px;
+        }
+        
+        .logo {
+            width: 110px;
+            height: auto;
+        }
+        
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-history {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+        
+        .message {
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            max-width: 85%;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .user-message {
+            background-color: var(--primary-color);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .bot-message {
+            background-color: var(--light-gray);
+            margin-right: auto;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .typing-cursor {
+            display: inline-block;
+            width: 8px;
+            height: 16px;
+            background-color: var(--primary-color);
+            animation: blink 1s infinite;
+            vertical-align: middle;
+            margin-right: 2px;
+        }
+        
+        .input-container {
+            display: flex;
+            gap: 10px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 25px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .input-field {
+            flex: 1;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 20px;
+            font-size: 16px;
+            outline: none;
+            background-color: var(--light-gray);
+        }
+        
+        .send-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .send-button:hover {
+            background-color: #1a4abf;
+        }
+        
+        .send-icon {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .welcome-message {
+            text-align: center;
+            color: #666;
+            margin: 20px 0;
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+        
+        .loading-dots {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .loading-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #aaa;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+        
+        .loading-dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+        
+        .loading-dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* تنسيقات Markdown للردود */
+        .bot-message h1, .bot-message h2, .bot-message h3 {
+            margin-top: 1em;
+            margin-bottom: 0.5em;
+        }
+        
+        .bot-message ul, .bot-message ol {
+            padding-right: 20px;
+            margin: 0.5em 0;
+        }
+        
+        .bot-message li {
+            margin-bottom: 0.3em;
+        }
+        
+        .bot-message strong {
+            font-weight: bold;
+        }
+        
+        .bot-message em {
+            font-style: italic;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .logo {
+                width: 200px;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-container">
+            <img src="https://www.ku.edu.kw/themes/custom/ku_tailwind/logo.svg" alt="شعار جامعة الكويت" class="logo">
+        </div>
+        
+        <div class="chat-container">
+           
+                
+            </div>
+            <div class="welcome-message">
+                <p>مرحباً بك في مساعد جامعة الكويت الذكي</p>
+                <p>كيف يمكنني مساعدتك اليوم؟</p>
+            </div>
+            
+            <div class="input-container">
+                <input type="text" class="input-field" placeholder="اكتب سؤالك هنا..." id="userInput">
+                <button class="send-button" id="sendButton">
+                    <svg class="send-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="chat-history" id="chatHistory">
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('userInput');
+            const sendButton = document.getElementById('sendButton');
+            const chatHistory = document.getElementById('chatHistory');
+            
+            // دالة لإضافة رسالة إلى المحادثة
+            function addMessage(text, isUser) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+                
+                if (isUser) {
+                    messageDiv.textContent = text;
+                } else {
+                    // للرسائل الآتية من البوت، نبدأ بمؤشر الكتابة
+                    messageDiv.innerHTML = `<span class="typing-cursor"></span>`;
+                }
+                
+                chatHistory.appendChild(messageDiv);
+                messageDiv.scrollIntoView({ behavior: 'smooth' });
+                
+                return messageDiv;
+            }
+            
+            // دالة لعرض مؤشر التحميل
+            function showLoading() {
+                const loadingDiv = document.createElement('div');
+                loadingDiv.className = 'message bot-message loading';
+                loadingDiv.id = 'loadingMessage';
+                loadingDiv.innerHTML = `
+                    <div class="loading-dots">
+                        <div class="loading-dot"></div>
+                        <div class="loading-dot"></div>
+                        <div class="loading-dot"></div>
+                    </div>
+                `;
+                chatHistory.appendChild(loadingDiv);
+                loadingDiv.scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            // دالة لإخفاء مؤشر التحميل
+            function hideLoading() {
+                const loadingDiv = document.getElementById('loadingMessage');
+                if (loadingDiv) {
+                    loadingDiv.remove();
+                }
+            }
+            
+            // دالة لكتابة النص حرفاً حرفاً
+            async function typeText(element, text) {
+                let i = 0;
+                const speed = 20; // سرعة الكتابة (كل X مللي ثانية)
+                
+                // إضافة مساحة فارغة في العنصر لبدء الكتابة
+                element.innerHTML = '';
+                
+                // إضافة مؤشر الكتابة مؤقتاً
+                const cursor = document.createElement('span');
+                cursor.className = 'typing-cursor';
+                element.appendChild(cursor);
+                
+                // محاكاة الكتابة
+                while (i < text.length) {
+                    // إزالة مؤشر الكتابة قبل إضافة الحرف
+                    if (cursor.parentNode) {
+                        cursor.remove();
+                    }
+                    
+                    // إضافة الحرف الجديد
+                    element.innerHTML += text.charAt(i);
+                    
+                    // إعادة إضافة مؤشر الكتابة
+                    element.appendChild(cursor);
+                    
+                    // التمرير لأسفل لرؤية أحدث الرسائل
+                    element.scrollIntoView({ behavior: 'smooth' });
+                    
+                    i++;
+                    await new Promise(resolve => setTimeout(resolve, speed + Math.random() * 30));
+                }
+                
+                // إزالة مؤشر الكتابة بعد اكتمال النص
+                cursor.remove();
+            }
+            
+            // دالة معالجة الأسئلة
+            function processQuestion(question) {
+                question = question.toLowerCase();
+                let response = '';
+                
+                // معالجة الأسئلة المتوقعة
+                if (question.includes('تحويل') && question.includes('كلية')) {
+                    response = `## شروط التحويل بين الكليات في جامعة الكويت:
+                    
+1. الانتظام في الكلية الحالية: يجب أن يكون الطالب منتظماً في الكلية المراد التحويل منها.
+2. المعدل التراكمي: تحقيق المعدل التراكمي المطلوب للكلية المراد التحويل إليها.
+3. الشروط الخاصة**: توفر الشروط الخاصة بكل كلية (قد تشمل مقررات معينة أو اختبارات).
+
+# ملاحظات مهمة:
+- بعض الكليات لديها شروط إضافية خاصة بها
+- مواعيد التحويل تكون محددة في كل فصل دراسي
+- يمكن مراجعة عمادة القبول والتسجيل لمزيد من التفاصيل`;
+                } 
+                else if (question.includes('قبول') || question.includes('نسبة')) {
+                    const percentageMatch = question.match(/(\d+)%/);
+                    if (percentageMatch) {
+                        const percentage = parseInt(percentageMatch[1]);
+                        if (percentage >= 80) {
+                            response = `# بناءً على نسبتك (${percentage}%):
+                            
+لديك **فرصة عالية** للقبول في معظم كليات الجامعة، بما في ذلك:
+
+- **كلية الطب : (نسبة القبول: 85% فما فوق)
+- **كلية الهندسة والبترول** (80% فما فوق)
+- **كلية الصيدلة** (82% فما فوق)
+
+ننصحك بالتقديم على الكليات التي تتناسب مع تفضيلاتك الشخصية وقدراتك.`;
+                        } else if (percentage >= 70) {
+                            response = `### بناءً على نسبتك (${percentage}%):
+                            
+لديك **فرصة متوسطة** للقبول في بعض الكليات مثل:
+
+- **كلية العلوم الإدارية** (75% فما فوق)
+- **كلية التربية** (72% فما فوق)
+- **كلية الآداب** (70% فما فوق)
+
+يمكنك تحسين فرصك من خلال:
+- إعادة بعض مواد الثانوية لرفع النسبة
+- البحث عن البرامج التي تقبل بنسب أقل`;
+                        } else {
+                            response = `### بناءً على نسبتك (${percentage}%):
+                            
+للأسف، نسبة القبول الدنيا في معظم كليات الجامعة هي **70%**. ولكن لديك بعض الخيارات:
+
+1. **برامج الدبلوم**: تقدم الجامعة بعض برامج الدبلوم التي قد تقبل نسب أقل
+2. **السنة التأسيسية**: بعض الكليات تقدم سنة تحضيرية
+3. **إعادة الاختبارات**: يمكنك تحسين نسبتك بإعادة بعض المواد
+
+ننصحك بزيارة مركز الإرشاد الأكاديمي في الجامعة لاستكشاف جميع الخيارات المتاحة لك.`;
+                        }
+                    } else {
+                        response = ` شروط القبول في جامعة الكويت:
+                        
+تختلف شروط القبول حسب الكلية، ولكن بشكل عام:
+
+### الكليات العلمية:
+- **الطب، الهندسة، الصيدلة**: 80% - 85% فما فوق
+- **العلوم، العمارة**: 75% - 80%
+
+### الكليات الأدبية:
+- **العلوم الإدارية، الحقوق**: 70% - 75%
+- **الآداب، التربية**: 65% - 70%
+
+*يرجى تزويدنا بنسبتك المئوية للحصول على تقييم أدق.*`;
+                    }
+                }
+                else if (question.includes('شروط') || question.includes('الالتحاق')) {
+                    response = `## شروط الالتحاق العامة بجامعة الكويت:
+
+### المتطلبات الأساسية:
+1. **شهادة الثانوية**: الحصول على شهادة الثانوية العامة الكويتية أو ما يعادلها
+2. **النسبة المئوية**: تحقيق النسبة المطلوبة للكلية المراد الالتحاق بها
+3. **الاختبارات**: اجتياز أي اختبارات أو مقابلات شخصية إن وجدت
+
+### المستندات المطلوبة:
+- صورة من شهادة الثانوية
+- صورة من البطاقة المدنية
+- صور شخصية
+- استمارة التقديم الإلكترونية
+
+*ملاحظة: بعض الكليات قد تطلب مستندات إضافية حسب التخصص*`;
+                }
+                else if (question.includes('السلام عليكم') || question.includes('مرحبا') || question.includes('اهلا')) {
+                    response = `وعليكم السلام ورحمة الله وبركاته! 🌟
+
+
+كيف يمكنني مساعدتك اليوم؟`;
+                }
+                else {
+                    response = `أهلاً بك في مساعد جامعة الكويت الذكي! 🤖
+
+يبدو أن سؤالك غير محدد، ولكن يمكنني مساعدتك في المواضيع التالية:
+
+### التحويل بين الكليات:
+- شروط التحويل
+- الإجراءات المطلوبة
+- المواعيد المهمة
+
+### شروط القبول:
+- النسب المطلوبة لكل كلية
+- المستندات اللازمة
+- مواعيد التقديم
+
+### استفسارات عامة:
+- عن الجامعة وكلياتها
+- الخدمات الطلابية
+- المنح الدراسية
+
+*يرجى صياغة سؤالك بشكل أكثر تحديداً للحصول على إجابة دقيقة.*`;
+                }
+                
+                return response;
+            }
+            
+            // دالة إرسال السؤال
+            async function sendQuestion() {
+                const question = input.value.trim();
+                if (!question) return;
+
+                // عرض رسالة المستخدم فوراً
+                addMessage(question, true);
+
+                // مسح حقل الإدخال
+                input.value = '';
+
+                // عرض مؤشر التحميل
+                showLoading();
+
+                try {
+                    const res = await fetch('/nlp/chat/answer', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ question })
+                    });
+
+                    const data = await res.json();
+                    hideLoading();
+
+                    // إضافة رسالة البوت وكتابة الرد حرفاً حرفاً
+                    const botMessageDiv = addMessage('', false);
+                    await typeText(botMessageDiv, (data && data.answer) ? data.answer : 'لم أستطع فهم السؤال.');
+                } catch (err) {
+                    hideLoading();
+                    const botMessageDiv = addMessage('', false);
+                    await typeText(botMessageDiv, '⚠️ حدث خطأ أثناء الاتصال بالخادم.');
+                    console.error(err);
+                }
+            }
+            
+            // أحداث الإدخال
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendQuestion();
+                }
+            });
+            
+            sendButton.addEventListener('click', sendQuestion);
+            
+            // التركيز على حقل الإدخال عند تحميل الصفحة
+            input.focus();
+        });
+    </script>
+</body>
+
+</html>
